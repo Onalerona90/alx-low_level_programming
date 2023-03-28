@@ -1,12 +1,16 @@
 #include "main.h"
 
 /**
- * reset_to_98 - resets the value of given interger to 98
- * @n: parameter
- * Return: nothing
+ * _strlen -returns the length of a string
+ * @s: string
+ * Return: returns lenght as integer
  */
 
-void reset_to_98(int *n)
+int _strlen(char *s)
 {
-	*n = 98;
+	int index;
+
+	for (index = 0; s[index] != '\0'; index++)
+		;
+	return (index);
 }
