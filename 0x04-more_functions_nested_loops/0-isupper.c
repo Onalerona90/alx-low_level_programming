@@ -4,7 +4,7 @@
  *@c: the charachter to be tested.
  *Return: 1 if true or 0 if false.
  */
-int _isupper(int c)
+int _isupper(int c)cd
 {
 if ((c > 64) && (c < 91))
 {
