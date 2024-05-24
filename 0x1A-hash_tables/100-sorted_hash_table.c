@@ -1,36 +1,39 @@
 #include "hash_tables.h"
 
 /**
- * hash_djb2 - Implementation of the djb2 hash function
- * @str: The string to hash
- *
- * Return: The hash value
-*/
-
-unsigned long int hash_djb2(const unsigned char *str)
-{
-    unsigned long int hash = 5381;
-    int c;
-
-    while ((c = *str++))
-    {
-        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
-    }
-
-    return (hash);
-}
-
-/**
- * key_index - Gives the index of a key
+ * create_shash_node - Creates a new sorted hash node
  * @key: The key
- * @size: The size of the array of the hash table
+ * @value: The value
  *
- * Return: The index at which the key/value pair should be stored in the array
+ * Return: A pointer to the created node, or NULL on failure
 */
 
-unsigned long int key_index(const unsigned char *key, unsigned long int size)
+shash_node_t *create_shash_node(const char *key, const char *value)
 {
-    return hash_djb2(key) % size;
+    shash_node_t *new_node;
+
+    new_node = malloc(sizeof(shash_node_t));
+    if (new_node == NULL)
+        return NULL;
+
+    new_node->key = strdup(key);
+    if (new_node->key == NULL)
+    {
+        free(new_node);
+        return NULL;
+    }
+    new_node->value = strdup(value);
+    if (new_node->value == NULL)
+    {
+        free(new_node->key);
+        free(new_node);
+        return NULL;
+    }
+    new_node->next = NULL;
+    new_node->sprev = NULL;
+    new_node->snext = NULL;
+
+    return new_node;
 }
 
 /**
@@ -62,81 +65,6 @@ shash_table_t *shash_table_create(unsigned long int size)
     ht->stail = NULL;
 
     return (ht);
-}
-
-/**
- * create_shash_node - Creates a new sorted hash node
- * @key: The key
- * @value: The value
- *
- * Return: A pointer to the created node, or NULL on failure
-*/
-
-shash_node_t *create_shash_node(const char *key, const char *value)
-{
-    shash_node_t *new_node;
-
-    new_node = malloc(sizeof(shash_node_t));
-    if (new_node == NULL)
-        return (NULL);
-
-    new_node->key = strdup(key);
-    if (new_node->key == NULL)
-    {
-        free(new_node);
-        return (NULL);
-    }
-    new_node->value = strdup(value);
-    if (new_node->value == NULL)
-    {
-        free(new_node->key);
-        free(new_node);
-        return (NULL);
-    }
-    new_node->next = NULL;
-    new_node->sprev = NULL;
-    new_node->snext = NULL;
-
-    return (new_node);
-}
-
-/**
- * insert_sorted_list - Inserts a node into the sorted linked list
- * @ht: The sorted hash table
- * @node: The node to insert
-*/
-
-void insert_sorted_list(shash_table_t *ht, shash_node_t *node)
-{
-    shash_node_t *current;
-
-    if (ht->shead == NULL)
-    {
-        ht->shead = node;
-        ht->stail = node;
-        return;
-    }
-
-    current = ht->shead;
-    while (current && strcmp(current->key, node->key) < 0)
-        current = current->snext;
-
-    if (current == NULL)
-    {
-        node->sprev = ht->stail;
-        ht->stail->snext = node;
-        ht->stail = node;
-    }
-    else
-    {
-        node->snext = current;
-        node->sprev = current->sprev;
-        if (current->sprev)
-            current->sprev->snext = node;
-        else
-            ht->shead = node;
-        current->sprev = node;
-    }
 }
 
 /**
